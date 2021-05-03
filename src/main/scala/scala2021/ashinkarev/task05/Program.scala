@@ -4,19 +4,12 @@ case class Info(employee: String, department: String, manager: String)
 
 object Program extends App {
   def findManagerName(employeeName: String): Option[String] = {
-    var employeeByName = new EmployeesProvider().findEmployeeByName(employeeName)
-
-    val manager = employeeByName match {
-      case Some(employee) => findEmployeeManager(employee)
-      case None => None
-    }
-
-    val managerEmployee = manager match {
-      case Some(manager) => new EmployeesProvider().findEmployeeById(manager.employeeId)
-      case None => None
-    }
-
-    return managerEmployee.map(_.name)
+    for {
+      employeeByName <- new EmployeesProvider().findEmployeeByName(employeeName)
+      employeeDepartment <- new DepartmentsProvider().findEmployeeDepartment(employeeByName)
+      departmentManager <- new ManagersProvider().findDepartmentManager(employeeDepartment)
+      managerEmployee <- new EmployeesProvider().findEmployeeById(departmentManager.employeeId)
+    } yield managerEmployee.name
   }
 
   def findEmployeeManager(employee: Employee): Option[Manager] = {
