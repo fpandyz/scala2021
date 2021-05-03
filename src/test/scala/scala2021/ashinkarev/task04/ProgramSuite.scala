@@ -23,4 +23,38 @@ class ProgramSuite extends AnyFunSuite with TableDrivenPropertyChecks with Scala
     assert(canReturnChange(List(1), 2) == false)
     assert(canReturnChange(List(2), 1) == false)
   }
+
+  val coins = List(5, 10, 5, 50, 10, 20, 100, 200, 200, 5, 3)
+  
+  val tectCasesTable = Table(
+    ("change", "expected"),
+    (1, false),
+    (5, true),
+    (10, true),
+    (15, true),
+    (20, true),
+    (24, false),
+    (25, true),
+    (30, true),
+    (35, true),
+    (40, true),
+    (45, true),
+    (50, true),
+    (59, false),
+    (95, true),
+    (98, true),
+    (103, true),
+    (103, true),
+    (608, true),
+    (609, false),
+    (1000, false),
+  )
+
+  test("check add correctly (table)") {
+    forAll(tectCasesTable) {
+      (change, expected) => {
+        canReturnChange(coins, change) should be(expected)
+      }
+    }
+  }
 }
