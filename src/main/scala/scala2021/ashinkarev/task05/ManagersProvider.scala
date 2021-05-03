@@ -1,5 +1,8 @@
 package scala2021.ashinkarev.task05
 
+import scala.concurrent._
+import ExecutionContext.Implicits.global
+
 case class Manager(department: String, employeeId: Int)
 
 class ManagersProvider {
@@ -8,6 +11,12 @@ class ManagersProvider {
     Manager("Sales", 10),
     Manager("IT", 14),
   )
+
+  def findDepartmentManagerOrErrorAsync(department: Department): Future[Either[String, Manager]] = {
+    Future {
+      findDepartmentManagerOrError(department)
+    }
+  }
 
   def findDepartmentManagerOrError(department: Department): Either[String, Manager] = {
     findDepartmentManager(department) match {

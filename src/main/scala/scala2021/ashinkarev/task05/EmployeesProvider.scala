@@ -1,5 +1,8 @@
 package scala2021.ashinkarev.task05
 
+import scala.concurrent._
+import ExecutionContext.Implicits.global
+
 case class Employee(id: Int, name: String, departmentId: Int)
 
 class EmployeesProvider {
@@ -14,6 +17,12 @@ class EmployeesProvider {
     Employee(15, "Megan", 3)
   )
 
+  def findEmployeeByNameOrErrorAsync(employeeName: String): Future[Either[String, Employee]] = {
+    Future {
+      findEmployeeByNameOrError(employeeName)
+    }
+  }
+
   def findEmployeeByNameOrError(employeeName: String): Either[String, Employee] = {
     findEmployeeByName(employeeName) match {
       case Some(value) => Right(value)
@@ -23,6 +32,12 @@ class EmployeesProvider {
 
   def findEmployeeByName(employeeName: String): Option[Employee] = {
     return employees.find(employee => employee.name == employeeName)
+  }
+
+  def findEmployeeByIdOrErrorAsync(employeeId: Int): Future[Either[String, Employee]] = {
+    Future {
+      findEmployeeByIdOrError(employeeId)
+    }
   }
 
   def findEmployeeByIdOrError(employeeId: Int): Either[String, Employee] = {
