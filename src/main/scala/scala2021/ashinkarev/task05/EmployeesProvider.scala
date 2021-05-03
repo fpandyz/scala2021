@@ -18,7 +18,21 @@ class EmployeesProvider {
     return employees.find(employee => employee.name == employeeName)
   }
 
+  def findEmployeeByNameOrError(employeeName: String): Either[String, Employee] = {
+    employees.find(employee => employee.name == employeeName) match {
+      case Some(value) => Right(value)
+      case None => Left(s"Cannot find employee with name: ${employeeName}")
+    }
+  }
+
   def findEmployeeById(employeeId: Int): Option[Employee] = {
     return employees.find(employee => employee.id == employeeId)
+  }
+
+  def findEmployeeByIdOrError(employeeId: Int): Either[String, Employee] = {
+    employees.find(employee => employee.id == employeeId) match {
+      case Some(value) => Right(value)
+      case None => Left(s"Cannot find employee with id: ${employeeId}")
+    }
   }
 }

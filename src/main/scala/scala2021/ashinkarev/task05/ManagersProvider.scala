@@ -12,4 +12,11 @@ class ManagersProvider {
   def findDepartmentManager(department: Department): Option[Manager] = {
     return managers.find(manager => manager.department == department.name)
   }
+
+  def findDepartmentManagerOrError(department: Department): Either[String, Manager] = {
+    managers.find(manager => manager.department == department.name) match {
+      case Some(value) => Right(value)
+      case None => Left(s"Cannot find manager for department with name: ${department.name}")
+    }
+  }
 }

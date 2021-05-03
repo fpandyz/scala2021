@@ -13,4 +13,11 @@ class DepartmentsProvider {
   def findEmployeeDepartment(employee: Employee): Option[Department] = {
     return departments.find(department => department.id == employee.departmentId)
   }
+
+  def findEmployeeDepartmentOrError(employee: Employee): Either[String, Department] = {
+    departments.find(department => department.id == employee.departmentId) match {
+      case Some(value) => Right(value)
+      case None => Left(s"Cannot find department with id: ${employee.departmentId} for employee with name: ${employee.name}")
+    }
+  }
 }

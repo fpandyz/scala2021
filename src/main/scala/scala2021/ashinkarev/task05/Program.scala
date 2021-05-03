@@ -12,4 +12,14 @@ object Program extends App {
       managerEmployee <- new EmployeesProvider().findEmployeeById(departmentManager.employeeId)
     } yield managerEmployee.name
   }
+   
+  // Найти имя менеджера по имени сотрудника, в случае ошибки в данных - указать что именно не так
+  def findManagerNameOrError(employeeName: String): Either[String, String] = {
+    for {
+      employeeByName <- new EmployeesProvider().findEmployeeByNameOrError(employeeName)
+      employeeDepartment <- new DepartmentsProvider().findEmployeeDepartmentOrError(employeeByName)
+      departmentManager <- new ManagersProvider().findDepartmentManagerOrError(employeeDepartment)
+      managerEmployee <- new EmployeesProvider().findEmployeeByIdOrError(departmentManager.employeeId)
+    } yield managerEmployee.name
+  }
 }
