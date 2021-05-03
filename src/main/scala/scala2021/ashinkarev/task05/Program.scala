@@ -48,4 +48,34 @@ object Program extends App {
           Future.successful(Left(value))
       }
   }
+
+  def findEmployeeManagers(): List[Info] = {
+    val employeesProvider = new EmployeesProvider()
+    val departmentsProvider = new DepartmentsProvider()
+    val managersProvider = new ManagersProvider()
+
+    val allEmployees = new EmployeesProvider().getAllEmployees()
+
+    return allEmployees
+      .map(employee => (employee, departmentsProvider.findEmployeeDepartment(employee)))
+      .map(e => (e._1, e._2, e._2 match {
+        case Some(department) => managersProvider.findDepartmentManager(department)
+        case None => None
+      }))
+      .map(e => (e._1, e._2, e._3, e._3 match {
+        case Some(manager) => employeesProvider.findEmployeeById(manager.employeeId)
+        case None => None
+      }))
+      .map(e => Info(
+        e._1.name, 
+        e._2 match {
+          case Some(value) => value.name
+          case None => "Not Found"
+        },
+        e._4 match {
+          case Some(value) => value.name
+          case None => "Not Found"
+        })
+      )
+  }
 }

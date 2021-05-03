@@ -14,6 +14,7 @@ class ProgramSuite extends AnyFunSuite with TableDrivenPropertyChecks with Scala
   import Program.findManagerName
   import Program.findManagerNameOrError
   import Program.findManagerNameOrErrorAsync
+  import Program.findEmployeeManagers
 
   test("findManagerName happy path") {
     findManagerName("Steve") should be (Some("Steve"))
@@ -87,5 +88,12 @@ class ProgramSuite extends AnyFunSuite with TableDrivenPropertyChecks with Scala
 
   test("findManagerNameOrErrorAsync for unknown department manager => Left") {
     findManagerNameOrErrorAsync("Megan")  map { result => result should be (noReasearch) }
+  }
+
+  test("findEmployeeManagers => 8 records") {
+    val result = findEmployeeManagers()
+    result should have length 8
+
+    result.foreach(println)
   }
 }

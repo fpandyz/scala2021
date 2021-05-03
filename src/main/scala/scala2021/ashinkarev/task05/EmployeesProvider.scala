@@ -17,6 +17,10 @@ class EmployeesProvider {
     Employee(15, "Megan", 3)
   )
 
+  def getAllEmployees(): List[Employee] = {
+    return employees
+  }
+
   def findEmployeeByNameOrErrorAsync(employeeName: String): Future[Either[String, Employee]] = {
     Future {
       findEmployeeByNameOrError(employeeName)
