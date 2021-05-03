@@ -13,4 +13,8 @@ class ProgramSuite extends AnyFunSuite with TableDrivenPropertyChecks with Scala
   test("findManagerName for unknown name => None") {
     assert(findManagerName("Unknown") === None)
   }
+  
+  test("findManagerName for Steve => IT") {
+    findManagerName("Steve") should be (Some("Steve"))
+  }
 }
