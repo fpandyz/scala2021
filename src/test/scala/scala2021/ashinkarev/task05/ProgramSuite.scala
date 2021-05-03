@@ -10,11 +10,25 @@ class ProgramSuite extends AnyFunSuite with TableDrivenPropertyChecks with Scala
 
   import Program.findManagerName
 
-  test("findManagerName for unknown name => None") {
-    assert(findManagerName("Unknown") === None)
-  }
-  
-  test("findManagerName for Steve => IT") {
+  test("findManagerName happy path") {
     findManagerName("Steve") should be (Some("Steve"))
+    findManagerName("Mark") should be (Some("Steve"))
+    findManagerName("Igor") should be (Some("Igor"))
+  }
+
+  test("findManagerName for unknown name => None") {
+    findManagerName("John") should be (None)
+  }
+
+  test("findManagerName for unknown department => None") {
+    findManagerName("Christy") should be (None)
+  }
+
+  test("findManagerName for unknown manager employee => None") {
+    findManagerName("Naveen") should be (None)
+  }
+
+  test("findManagerName for unknown department manager => None") {
+    findManagerName("Megan") should be (None)
   }
 }
