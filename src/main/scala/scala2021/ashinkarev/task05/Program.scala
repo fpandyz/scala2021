@@ -19,40 +19,36 @@ object Program extends App {
   // Найти имя менеджера по имени сотрудника, в случае ошибки в данных - указать что именно не так
   def findManagerNameOrError(employeeName: String): Either[String, String] = {
     for {
-      employeeByName <- new EmployeesProvider().findEmployeeByNameOrError(employeeName)
-      employeeDepartment <- new DepartmentsProvider().findEmployeeDepartmentOrError(employeeByName)
-      departmentManager <- new ManagersProvider().findDepartmentManagerOrError(employeeDepartment)
-      managerEmployee <- new EmployeesProvider().findEmployeeByIdOrError(departmentManager.employeeId)
+      employeeByName <- EmployeesProvider.findEmployeeByNameOrError(employeeName)
+      employeeDepartment <- DepartmentsProvider.findEmployeeDepartmentOrError(employeeByName)
+      departmentManager <- ManagersProvider.findDepartmentManagerOrError(employeeDepartment)
+      managerEmployee <- EmployeesProvider.findEmployeeByIdOrError(departmentManager.employeeId)
     } yield managerEmployee.name
   }
 
   // Найти имя менеджера по имени сотрудника, в случае ошибки в данных - указать что именно не так и сделать все это асинхронно
   def findManagerNameOrErrorAsync(employeeName: String): Future[Either[String, String]] = {
     val result = for {
-      employeeByName <- EitherT(new EmployeesProvider().findEmployeeByNameOrErrorAsync(employeeName))
-      employeeDepartment <- EitherT(new DepartmentsProvider().findEmployeeDepartmentOrErrorAsync(employeeByName))
-      departmentManager <- EitherT(new ManagersProvider().findDepartmentManagerOrErrorAsync(employeeDepartment))
-      managerEmployee <- EitherT(new EmployeesProvider().findEmployeeByIdOrErrorAsync(departmentManager.employeeId))
+      employeeByName <- EitherT(EmployeesProvider.findEmployeeByNameOrErrorAsync(employeeName))
+      employeeDepartment <- EitherT(DepartmentsProvider.findEmployeeDepartmentOrErrorAsync(employeeByName))
+      departmentManager <- EitherT(ManagersProvider.findDepartmentManagerOrErrorAsync(employeeDepartment))
+      managerEmployee <- EitherT(EmployeesProvider.findEmployeeByIdOrErrorAsync(departmentManager.employeeId))
     } yield managerEmployee.name;
 
     return result.value;
   }
 
   def findEmployeeManagers(): List[Info] = {
-    val employeesProvider = new EmployeesProvider()
-    val departmentsProvider = new DepartmentsProvider()
-    val managersProvider = new ManagersProvider()
-
-    val allEmployees = new EmployeesProvider().getAllEmployees()
+    val allEmployees = EmployeesProvider.getAllEmployees()
 
     return allEmployees
-      .map(employee => (employee, departmentsProvider.findEmployeeDepartment(employee)))
+      .map(employee => (employee, DepartmentsProvider.findEmployeeDepartment(employee)))
       .map(e => (e._1, e._2, e._2 match {
-        case Some(department) => managersProvider.findDepartmentManager(department)
+        case Some(department) => ManagersProvider.findDepartmentManager(department)
         case None => None
       }))
       .map(e => (e._1, e._2, e._3, e._3 match {
-        case Some(manager) => employeesProvider.findEmployeeById(manager.employeeId)
+        case Some(manager) => EmployeesProvider.findEmployeeById(manager.employeeId)
         case None => None
       }))
       .map(e => Info(

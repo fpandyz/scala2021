@@ -7,8 +7,8 @@ import scala2021.ashinkarev.task05.Utils._
 
 case class Department(id: Int, name: String)
 
-class DepartmentsProvider {
-  private val departments = List(
+object DepartmentsProvider {
+  private var departments = List(
     Department(1, "Marketing"),
     Department(2, "Sales"),
     Department(3, "Research"),
