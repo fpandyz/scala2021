@@ -6,15 +6,14 @@ import ExecutionContext.Implicits.global
 import cats._
 import cats.data.EitherT
 
+import scala2021.ashinkarev.task05.Utils._
+
 case class Info(employee: String, department: String, manager: String)
 
 object Program extends App {
   // Найти имя менеджера департамента, в котором работает сотрудник по имени сотрудника
   def findManagerName(employeeName: String): Option[String] = {
-    findManagerNameOrError(employeeName) match {
-      case Left(value) => None
-      case Right(value) => Some(value)
-    }
+    toOption(findManagerNameOrError(employeeName))
   }
    
   // Найти имя менеджера по имени сотрудника, в случае ошибки в данных - указать что именно не так
