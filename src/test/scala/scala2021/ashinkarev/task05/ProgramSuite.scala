@@ -9,7 +9,11 @@ import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 import scala.concurrent._
 import ExecutionContext.Implicits.global
 
-class ProgramSuite extends AnyFunSuite with TableDrivenPropertyChecks with ScalaCheckDrivenPropertyChecks with Matchers {
+class ProgramSuite extends AnyFunSuite 
+  with TableDrivenPropertyChecks 
+  with ScalaCheckDrivenPropertyChecks 
+  with Matchers 
+{
 
   import Program.findManagerName
   import Program.findManagerNameOrError

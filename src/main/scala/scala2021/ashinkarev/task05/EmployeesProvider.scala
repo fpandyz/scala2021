@@ -7,7 +7,7 @@ import scala2021.ashinkarev.task05.Utils._
 
 case class Employee(id: Int, name: String, departmentId: Int)
 
-object  EmployeesProvider {
+trait EmployeesProvider {
   private var employees = List(
     Employee(1, "Steve", 1),
     Employee(3, "Mark", 1),
