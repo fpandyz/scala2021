@@ -7,4 +7,11 @@ object Utils {
       case Left(value) => None
     }
   }
+
+  def toEitherWithErrorMessage[A](option: Option[A], erorrFactory: () => String): Either[String, A] = {
+    option match {
+      case Some(value) => Right(value)
+      case None => Left(erorrFactory())
+    }
+  }
 }

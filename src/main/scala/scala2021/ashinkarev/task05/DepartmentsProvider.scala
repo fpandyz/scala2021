@@ -3,6 +3,8 @@ package scala2021.ashinkarev.task05
 import scala.concurrent._
 import ExecutionContext.Implicits.global
 
+import scala2021.ashinkarev.task05.Utils._
+
 case class Department(id: Int, name: String)
 
 class DepartmentsProvider {
@@ -20,10 +22,7 @@ class DepartmentsProvider {
   }
 
   def findEmployeeDepartmentOrError(employee: Employee): Either[String, Department] = {
-    findEmployeeDepartment(employee) match {
-      case Some(value) => Right(value)
-      case None => Left(s"Cannot find department with id: ${employee.departmentId} for employee with name: ${employee.name}")
-    }
+    toEitherWithErrorMessage(findEmployeeDepartment(employee), () => s"Cannot find department with id: ${employee.departmentId} for employee with name: ${employee.name}")
   }
 
   def findEmployeeDepartment(employee: Employee): Option[Department] = {
