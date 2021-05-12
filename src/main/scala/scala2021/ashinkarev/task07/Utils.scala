@@ -8,16 +8,13 @@ trait Connection {
   def run();
 }
 
-abstract class ConnectionBase(port: Int) extends Connection {
+class PrintConnection(port: Int) extends Connection {
   def close() = {
     println("Closed")
   }
   def run() = {
     println("Run")
   }
-}
-
-class PrintConnection(port: Int) extends ConnectionBase(port) {
 }
 
 object Utils {
