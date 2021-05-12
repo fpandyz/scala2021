@@ -25,44 +25,7 @@ object Utils {
     (cleanup: (TResource) => Unit = (resource: TResource) => {}): TResult = {
     var resource: TResource = null.asInstanceOf[TResource]
     var result: TResult = null.asInstanceOf[TResult]
-    // try {
-    //   resource = resourceFactory();
-
-    //   body(resource);
-    // } finally {
-    //   println("Get to finally");
-    //   cleanup(resource)
-    // }
-
-    // try {
-    //   resource = resourceFactory();
-
-    //   body(resource);
-    // } 
-    // catch {
-    //     case _: Throwable => println("Got some other kind of Throwable exception"); throw
-    // } finally {
-    //     // your scala code here, such as closing a database connection
-    //     // or file handle
-    // }
-
-    // val tryReslut = Try {
-    //   resource = resourceFactory();
-
-    //   result = body(resource);
-    // } recoverWith {
-    //   case originalException => {
-    //     println("exception occured at creation or in body")
-
-    //     Try {
-    //       cleanup(resource)
-    //     } match {
-    //       case Success(value) => throw originalException;
-    //       case Failure(cleanupException) => throw originalException;
-    //     }
-    //   }
-    // };
-
+    
     Try {
       resource = resourceFactory();
 
@@ -100,19 +63,5 @@ object Utils {
         }
       }
     }
-
-    // Try {
-    //   resource = resourceFactory();
-
-    //   body(resource);
-    // } match {
-    //   case Success(value) => value
-    //   case Failure(exception) => Try {
-    //     cleanup(resource)
-    //   } match {
-    //     case Success(value) => throw exception
-    //     case Failure(cleanupException) => throw cleanupException
-    //   }
-    // }
   }
 }
