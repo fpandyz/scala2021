@@ -6,6 +6,8 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.prop.TableDrivenPropertyChecks
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 import org.scalamock.scalatest.MockFactory
+import org.scalamock.function.MockFunction
+import org.scalamock.function.MockFunction1
 
 class UtilsSuite extends AnyFunSuite 
   with TableDrivenPropertyChecks 
@@ -81,49 +83,45 @@ class UtilsSuite extends AnyFunSuite
   test("withResource with exception in the body => throws original exception and makes cleanup") {
     val errorMessage = "Cannot end my run, sorry.";
 
-    val mockedConnection = mock[Connection];
-
-    val mockedRun = mockFunction[Connection, Any];
-    val mockedCleanup = mockFunction[Connection, Unit];
-
-    mockedRun.expects(*).throws(new Exception(errorMessage))
-    mockedCleanup expects(mockedConnection) repeat (1)
-
-    val thrown = intercept[Exception] {
-      withResource(() => mockedConnection){ mockedRun }(mockedCleanup)
-    }
-
-    thrown.getMessage should be (errorMessage);
+    verifyErrorCase(
+      errorMessage,
+      (mockedRun, _) => mockedRun.expects(*).throws(new Exception(errorMessage)),
+      (mockedCleanup, connection) => mockedCleanup expects(connection) repeat (1)
+    )
   }
 
   test("withResource with exception in cleanup => throws cleanup exception") {
     val errorMessage = "Cannot cleanup, sorry.";
 
-    val mockedConnection = mock[Connection];
-
-    val mockedRun = mockFunction[Connection, Any];
-    val mockedCleanup = mockFunction[Connection, Unit];
-
-    mockedRun expects(mockedConnection) repeat (1)
-    mockedCleanup.expects(*).throws(new Exception(errorMessage))
-
-    val thrown = intercept[Exception] {
-      withResource(() => mockedConnection){ mockedRun }(mockedCleanup)
-    }
-
-    thrown.getMessage should be (errorMessage);
+    verifyErrorCase(
+      errorMessage,
+      (mockedRun, connection) => mockedRun expects(connection) repeat (1),
+      (mockedCleanup, _) => mockedCleanup.expects(*).throws(new Exception(errorMessage))
+    )
   }
   
   test("withResource with exception in the body and in cleanup => throws body exception") {
     val errorMessage = "Cannot end my run, sorry.";
 
+    verifyErrorCase(
+      errorMessage,
+      (mockedRun, _) => mockedRun.expects(*).throws(new Exception(errorMessage)),
+      (mockedCleanup, _) => mockedCleanup.expects(*).throws(new Exception("Cannot do cleanup, sorry."))
+    )
+  }
+
+  def verifyErrorCase(
+    errorMessage: String,
+    mockedRunSetup: (MockFunction1[Connection, Any], Connection) => Any,
+    mockedCleanupSetup: (MockFunction1[Connection, Unit], Connection) => Any
+  ) {
     val mockedConnection = mock[Connection];
 
     val mockedRun = mockFunction[Connection, Any];
     val mockedCleanup = mockFunction[Connection, Unit];
 
-    mockedRun.expects(*).throws(new Exception(errorMessage))
-    mockedCleanup.expects(*).throws(new Exception("Cannot do cleanup, sorry."))
+    mockedRunSetup(mockedRun, mockedConnection)
+    mockedCleanupSetup(mockedCleanup, mockedConnection)
 
     val thrown = intercept[Exception] {
       withResource(() => mockedConnection){ mockedRun }(mockedCleanup)
