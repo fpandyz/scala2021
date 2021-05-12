@@ -47,10 +47,18 @@ class UtilsSuite extends AnyFunSuite
   test("withResource with exception in the constructor => throws original exception and cannot cleanup since there is no resource being created succesfully") {
     val errorMessage = "Cannot create port, sorry.";
 
+    val mockedConnectionFactory = mockFunction[Connection];
+
+    val mockedRun = mockFunction[Connection, Any];
+    val mockedCleanup = mockFunction[Connection, Unit];
+
+    mockedConnectionFactory.expects().throws(new Exception(errorMessage))
+
+    mockedRun expects(*) repeat (0)
+    mockedCleanup expects(*) repeat (0)
+
     val thrown = intercept[Exception] {
-      withResource(() => new BrokenConnectionConstructor(() => throw  new Exception(errorMessage))){ conn =>
-        conn.run
-      }((connection) => connection.close())
+      withResource(mockedConnectionFactory){ mockedRun }(mockedCleanup)
     }
 
     thrown.getMessage should be (errorMessage);
@@ -59,10 +67,16 @@ class UtilsSuite extends AnyFunSuite
   test("withResource with exception in the body => throws original exception and makes cleanup") {
     val errorMessage = "Cannot end my run, sorry.";
 
+    val mockedConnection = mock[Connection];
+
+    val mockedRun = mockFunction[Connection, Any];
+    val mockedCleanup = mockFunction[Connection, Unit];
+
+    mockedRun.expects(*).throws(new Exception(errorMessage))
+    mockedCleanup expects(mockedConnection) repeat (1)
+
     val thrown = intercept[Exception] {
-      withResource(() => new BrokenConnectionRun(9000)){ conn =>
-        conn.run
-      }((connection) => connection.close())
+      withResource(() => mockedConnection){ mockedRun }(mockedCleanup)
     }
 
     thrown.getMessage should be (errorMessage);
@@ -71,12 +85,16 @@ class UtilsSuite extends AnyFunSuite
   test("withResource with exception in cleanup => throws cleanup exception") {
     val errorMessage = "Cannot cleanup, sorry.";
 
+    val mockedConnection = mock[Connection];
+
+    val mockedRun = mockFunction[Connection, Any];
+    val mockedCleanup = mockFunction[Connection, Unit];
+
+    mockedRun expects(mockedConnection) repeat (1)
+    mockedCleanup.expects(*).throws(new Exception(errorMessage))
+
     val thrown = intercept[Exception] {
-      withResource(() => new PrintConnection(9000)){ conn =>
-        conn.run
-      }((connection) => {
-        throw new Exception(errorMessage);
-      })
+      withResource(() => mockedConnection){ mockedRun }(mockedCleanup)
     }
 
     thrown.getMessage should be (errorMessage);
@@ -85,12 +103,16 @@ class UtilsSuite extends AnyFunSuite
   test("withResource with exception in the body and in cleanup => throws body exception") {
     val errorMessage = "Cannot end my run, sorry.";
 
+    val mockedConnection = mock[Connection];
+
+    val mockedRun = mockFunction[Connection, Any];
+    val mockedCleanup = mockFunction[Connection, Unit];
+
+    mockedRun.expects(*).throws(new Exception(errorMessage))
+    mockedCleanup.expects(*).throws(new Exception("Cannot do cleanup, sorry."))
+
     val thrown = intercept[Exception] {
-      withResource(() => new BrokenConnectionRun(9000)){ conn =>
-        conn.run
-      }((connection) => {
-        throw new Exception("Cannot do cleanup, sorry.");
-      })
+      withResource(() => mockedConnection){ mockedRun }(mockedCleanup)
     }
 
     thrown.getMessage should be (errorMessage);
