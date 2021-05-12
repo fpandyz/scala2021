@@ -5,11 +5,12 @@ import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.prop.TableDrivenPropertyChecks
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
+import org.scalamock.scalatest.MockFactory
 
-case class BrokenConnectionConstructor(portFactory: () => Int) extends Connection(portFactory()) {
+class BrokenConnectionConstructor(portFactory: () => Int) extends ConnectionBase(portFactory()) {
 }
 
-case class BrokenConnectionRun(port: Int) extends Connection(port) {
+class BrokenConnectionRun(port: Int) extends ConnectionBase(port) {
   override def run(): Unit = {
     println("Start run override");
     throw new Exception("Cannot end my run, sorry.")
@@ -21,22 +22,33 @@ class UtilsSuite extends AnyFunSuite
   with TableDrivenPropertyChecks 
   with ScalaCheckDrivenPropertyChecks 
   with Matchers
+  with MockFactory
 {
 
   import Utils.withConnection
   import Utils.withResource
 
-  test("withConnection happy path") {
-    withConnection(port = 9000) { conn =>
-      conn.run
-    }
+  test("withResource happy path => resourceFactory and cleanup called exactly once and body called with the created resource") {
+    val connection = new PrintConnection(9000);
+
+    val mockedConnectionFactory = mockFunction[Connection];
+
+    val mockedRun = mockFunction[Connection, Any];
+    val mockedCleanup = mockFunction[Connection, Unit];
+
+    mockedConnectionFactory.expects().onCall(() => connection).once()
+
+    mockedRun expects(connection) repeat (1)
+    mockedCleanup expects(connection) repeat (1)
+
+    withResource(mockedConnectionFactory){ mockedRun }(mockedCleanup)
   }
 
   test("withResource with exception in the constructor => throws original exception and cannot cleanup since there is no resource being created succesfully") {
     val errorMessage = "Cannot create port, sorry.";
 
     val thrown = intercept[Exception] {
-      withResource(() => BrokenConnectionConstructor(() => throw  new Exception(errorMessage))){ conn =>
+      withResource(() => new BrokenConnectionConstructor(() => throw  new Exception(errorMessage))){ conn =>
         conn.run
       }((connection) => connection.close())
     }
@@ -48,7 +60,7 @@ class UtilsSuite extends AnyFunSuite
     val errorMessage = "Cannot end my run, sorry.";
 
     val thrown = intercept[Exception] {
-      withResource(() => BrokenConnectionRun(9000)){ conn =>
+      withResource(() => new BrokenConnectionRun(9000)){ conn =>
         conn.run
       }((connection) => connection.close())
     }
@@ -60,7 +72,7 @@ class UtilsSuite extends AnyFunSuite
     val errorMessage = "Cannot cleanup, sorry.";
 
     val thrown = intercept[Exception] {
-      withResource(() => PrintConnection(9000)){ conn =>
+      withResource(() => new PrintConnection(9000)){ conn =>
         conn.run
       }((connection) => {
         throw new Exception(errorMessage);
@@ -74,7 +86,7 @@ class UtilsSuite extends AnyFunSuite
     val errorMessage = "Cannot end my run, sorry.";
 
     val thrown = intercept[Exception] {
-      withResource(() => BrokenConnectionRun(9000)){ conn =>
+      withResource(() => new BrokenConnectionRun(9000)){ conn =>
         conn.run
       }((connection) => {
         throw new Exception("Cannot do cleanup, sorry.");

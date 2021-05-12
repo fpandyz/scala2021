@@ -2,7 +2,13 @@ package scala2021.ashinkarev.task07
 
 import scala.util.{Try,Success,Failure}
 
-abstract class Connection(port: Int) {
+trait Connection {
+  def close();
+
+  def run();
+}
+
+abstract class ConnectionBase(port: Int) extends Connection {
   def close() = {
     println("Closed")
   }
@@ -11,12 +17,12 @@ abstract class Connection(port: Int) {
   }
 }
 
-case class PrintConnection(port: Int) extends Connection(port) {
+class PrintConnection(port: Int) extends ConnectionBase(port) {
 }
 
 object Utils {
   def withConnection[TResult](port: Int)(body: (Connection) => TResult) = {
-    withResource(() => PrintConnection(port))(body)((connection) => connection.close())
+    withResource(() => new PrintConnection(port))(body)((connection) => connection.close())
   }
 
   def withResource[TResource, TResult]
