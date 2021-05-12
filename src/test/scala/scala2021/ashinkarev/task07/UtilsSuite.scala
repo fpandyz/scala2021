@@ -16,6 +16,31 @@ class UtilsSuite extends AnyFunSuite
 
   import Utils.withConnection
   import Utils.withResource
+  import Utils.withFile
+  import Utils.withFileInputStream
+
+  test("withConnection happy path") {
+    withConnection(port = 9000) {
+      conn => conn.run
+    }
+  }
+
+  test("withFile happy path") {
+    val readmeExists = withFile(path = "README.md") {
+      file => file.exists()
+    }
+
+    readmeExists should be (true)
+  }
+
+  test("withFileInputStream happy path") {
+    withFileInputStream(path = "README.md") {
+      fis => {
+        val bytes = fis.available()
+        println(s"Count bytes are $bytes")
+      }
+    }
+  }
 
   test("withResource happy path => resourceFactory and cleanup called exactly once and body called with the created resource") {
     val connection = new PrintConnection(9000);
