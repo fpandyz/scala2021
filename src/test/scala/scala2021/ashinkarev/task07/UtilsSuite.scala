@@ -7,17 +7,6 @@ import org.scalatest.prop.TableDrivenPropertyChecks
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 import org.scalamock.scalatest.MockFactory
 
-class BrokenConnectionConstructor(portFactory: () => Int) extends ConnectionBase(portFactory()) {
-}
-
-class BrokenConnectionRun(port: Int) extends ConnectionBase(port) {
-  override def run(): Unit = {
-    println("Start run override");
-    throw new Exception("Cannot end my run, sorry.")
-    println("End run override");
-  }
-}
-
 class UtilsSuite extends AnyFunSuite 
   with TableDrivenPropertyChecks 
   with ScalaCheckDrivenPropertyChecks 
