@@ -38,32 +38,25 @@ object Utils {
       result = body(resource);
     } match {
       case Success(value) => {
-        println("creation and body passed fine")
         Try {
           cleanup(resource)
         } match {
           case Success(value) => {
-            println("happy path cleanup successfully passed")
             result
           };
           case Failure(cleanupException) => {
-            println("exception at cleanup " + cleanupException.getMessage());
             throw cleanupException;
           }
         }
       }
       case Failure(originalException) => {
-        println("exception occured at creation or in body " + originalException)
-
         Try {
           cleanup(resource)
         } match {
           case Success(value) => {
-            println("creation or body error cleanup successfully passed")
             throw originalException;
           }
           case Failure(cleanupException) => {
-            println("exception at cleanup after original exception " + cleanupException.getMessage())
             throw originalException;
           };
         }
