@@ -22,4 +22,8 @@ class GameSuite extends AnyFunSuite with TableDrivenPropertyChecks with ScalaChe
   test("first frame not all pins for 2 throws => sum of throws") {
     new Game("72").calculateScore() should be (9)
   }
+
+  test("strike, 7 => | 10 + 7 | + | 7 |") {
+    new Game("X|7").calculateScore() should be (24)
+  }
 }
