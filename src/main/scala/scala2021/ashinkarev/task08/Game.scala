@@ -79,10 +79,12 @@ class Game(input: String) {
             number = currentFrame.number + 1, 
           )
 
+          val tenFramesPast = frames.length == 10;
+
           calculateScore(
             inputSymbolIndex = inputSymbolIndex + 1, 
             currentFrame = nextFrame,
-            frames = frames :+ nextFrame,
+            frames = if (tenFramesPast) frames else frames :+ nextFrame,
           )
         }
         case _ => {
