@@ -9,6 +9,8 @@ import org.scalamock.scalatest.MockFactory
 import org.scalamock.function.MockFunction
 import org.scalamock.function.MockFunction1
 
+import scala.util.{Success}
+
 class UtilsSuite extends AnyFunSuite 
   with TableDrivenPropertyChecks 
   with ScalaCheckDrivenPropertyChecks 
@@ -32,7 +34,7 @@ class UtilsSuite extends AnyFunSuite
       file => file.exists()
     }
 
-    readmeExists should be (true)
+    readmeExists should be (Success(true))
   }
 
   test("withFileInputStream happy path") {
@@ -73,11 +75,10 @@ class UtilsSuite extends AnyFunSuite
     mockedRun expects(*) repeat (0)
     mockedCleanup expects(*) repeat (0)
 
-    val thrown = intercept[Exception] {
-      withResource(mockedConnectionFactory){ mockedRun }(mockedCleanup)
-    }
+    val result = withResource(mockedConnectionFactory){ mockedRun }(mockedCleanup);
 
-    thrown.getMessage should be (errorMessage);
+    result.isFailure should be (true);
+    result.failed.get.getMessage should be (errorMessage);
   }
 
   test("withResource with exception in the body => throws original exception and makes cleanup") {
@@ -122,11 +123,10 @@ class UtilsSuite extends AnyFunSuite
 
     mockedRunSetup(mockedRun, mockedConnection)
     mockedCleanupSetup(mockedCleanup, mockedConnection)
+    
+    val result = withResource(() => mockedConnection){ mockedRun }(mockedCleanup)
 
-    val thrown = intercept[Exception] {
-      withResource(() => mockedConnection){ mockedRun }(mockedCleanup)
-    }
-
-    thrown.getMessage should be (errorMessage);
+    result.isFailure should be (true);
+    result.failed.get.getMessage should be (errorMessage);
   }
 }

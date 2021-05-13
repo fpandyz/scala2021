@@ -35,7 +35,7 @@ object Utils {
   def withResource[TResource, TResult]
     (resourceFactory: () => TResource)
     (body: (TResource) => TResult)
-    (cleanup: (TResource) => Unit = (resource: TResource) => {}): TResult = {
+    (cleanup: (TResource) => Unit = (resource: TResource) => {}): Try[TResult] = {
     var resource: TResource = null.asInstanceOf[TResource]
     var result: TResult = null.asInstanceOf[TResult]
     
@@ -48,24 +48,15 @@ object Utils {
         Try {
           cleanup(resource)
         } match {
-          case Success(value) => {
-            result
-          };
-          case Failure(cleanupException) => {
-            throw cleanupException;
-          }
+          case Success(value) => Success(result)
+          case Failure(cleanupException) => Failure(cleanupException)
         }
       }
       case Failure(originalException) => {
         Try {
           cleanup(resource)
         } match {
-          case Success(value) => {
-            throw originalException;
-          }
-          case Failure(cleanupException) => {
-            throw originalException;
-          };
+          case _ => Failure(originalException)
         }
       }
     }
