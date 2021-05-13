@@ -33,7 +33,7 @@ case class Frame(
 }
 
 class Game(input: String) {
-  def calculateScore(): Int = {
+  def score(): Int = {
     @tailrec
     def calculateScore(
       inputSymbolIndex: Int,
