@@ -149,7 +149,10 @@ class Game(input: String) {
         List(
           Frame(
             number = firstFrameOfLastThree.number, 
-            throws = if (firstFrameOfLastThree.isStrike || firstFrameOfLastThree.isSpare) firstFrameOfLastThree.throws :+ currentThrow else firstFrameOfLastThree.throws
+            throws = firstFrameOfLastThree.throws.length match {
+              case 3 => firstFrameOfLastThree.throws
+              case _ => firstFrameOfLastThree.throws :+ currentThrow
+            }
           ),
           secondFrameOfLastThree.updateFrame(currentThrow),
         )
