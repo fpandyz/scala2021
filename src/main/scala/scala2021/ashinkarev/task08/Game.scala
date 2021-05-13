@@ -62,12 +62,14 @@ class Game(input: String) {
           )
         }
         case Symbols.SPARE => {
-          val newFrameState = currentFrame.updateFrame(10 - currentFrame.throws.last);
+          val currentThrow = 10 - currentFrame.throws.last;
+
+          val newFrameState = currentFrame.updateFrame(currentThrow);
 
           calculateScore(
             inputSymbolIndex = inputSymbolIndex + 1, 
             currentFrame = newFrameState,
-            frames = frames.dropRight(1) :+ newFrameState,
+            frames = updateFrames(frames, newFrameState),
           )
         }
         case Symbols.FRAME => {
@@ -84,51 +86,12 @@ class Game(input: String) {
         case _ => {
           val currentThrow = symbol.asDigit;
 
-          val newFrameState = currentFrame.updateFrame(symbol.asDigit);
+          val newFrameState = currentFrame.updateFrame(currentThrow);
 
-          val numberOfFramesThatCouldUpdate = math.min(frames.length, 3);
-
-          val lastFramesThatCouldUpdateScore = frames.takeRight(numberOfFramesThatCouldUpdate);
-
-          val updatedLastFrames = lastFramesThatCouldUpdateScore.length match {
-            case 3 => {
-              val firstFrameOfLastThree = lastFramesThatCouldUpdateScore(0);
-              val secondFrameOfLastThree = lastFramesThatCouldUpdateScore(1);
-              val thirdFrameOfLastThree = lastFramesThatCouldUpdateScore(2);
-
-              List(
-                Frame(
-                  number = firstFrameOfLastThree.number, 
-                  throws = if (firstFrameOfLastThree.isStrike) firstFrameOfLastThree.throws :+ currentThrow else firstFrameOfLastThree.throws
-                ),
-                Frame(
-                  number = secondFrameOfLastThree.number, 
-                  throws = if (secondFrameOfLastThree.isStrike || secondFrameOfLastThree.isSpare) secondFrameOfLastThree.throws :+ currentThrow else secondFrameOfLastThree.throws
-                ),
-                thirdFrameOfLastThree.updateFrame(currentThrow),
-              )
-            }
-            case 2 => {
-              val firstFrameOfLastThree = lastFramesThatCouldUpdateScore(0);
-              val secondFrameOfLastThree = lastFramesThatCouldUpdateScore(1);
-
-              List(
-                Frame(
-                  number = firstFrameOfLastThree.number, 
-                  throws = if (firstFrameOfLastThree.isStrike || firstFrameOfLastThree.isSpare) firstFrameOfLastThree.throws :+ currentThrow else firstFrameOfLastThree.throws
-                ),
-                secondFrameOfLastThree.updateFrame(currentThrow),
-              )
-            }
-            case 1 => List(
-              currentFrame.updateFrame(currentThrow)
-            )
-          };
-          
           calculateScore(
             inputSymbolIndex = inputSymbolIndex + 1, 
             currentFrame = newFrameState,
-            frames = frames.dropRight(numberOfFramesThatCouldUpdate) ::: updatedLastFrames,
+            frames = updateFrames(frames, newFrameState),
           )
         }
       }
@@ -141,5 +104,50 @@ class Game(input: String) {
       currentFrame = firstFrame,
       frames = List(firstFrame), 
     );
+  }
+
+  def updateFrames(frames: List[Frame], newFrameState: Frame): List[Frame] = {
+    val currentThrow = newFrameState.throws.last;
+
+    val numberOfFramesThatCouldUpdate = math.min(frames.length, 3);
+
+    val lastFramesThatCouldUpdateScore = frames.takeRight(numberOfFramesThatCouldUpdate);
+
+    val updatedLastFrames = lastFramesThatCouldUpdateScore.length match {
+      case 3 => {
+        val firstFrameOfLastThree = lastFramesThatCouldUpdateScore(0);
+        val secondFrameOfLastThree = lastFramesThatCouldUpdateScore(1);
+        val thirdFrameOfLastThree = lastFramesThatCouldUpdateScore(2);
+
+        List(
+          Frame(
+            number = firstFrameOfLastThree.number, 
+            throws = if (firstFrameOfLastThree.isStrike) firstFrameOfLastThree.throws :+ currentThrow else firstFrameOfLastThree.throws
+          ),
+          Frame(
+            number = secondFrameOfLastThree.number, 
+            throws = if (secondFrameOfLastThree.isStrike || secondFrameOfLastThree.isSpare) secondFrameOfLastThree.throws :+ currentThrow else secondFrameOfLastThree.throws
+          ),
+          thirdFrameOfLastThree.updateFrame(currentThrow),
+        )
+      }
+      case 2 => {
+        val firstFrameOfLastThree = lastFramesThatCouldUpdateScore(0);
+        val secondFrameOfLastThree = lastFramesThatCouldUpdateScore(1);
+
+        List(
+          Frame(
+            number = firstFrameOfLastThree.number, 
+            throws = if (firstFrameOfLastThree.isStrike || firstFrameOfLastThree.isSpare) firstFrameOfLastThree.throws :+ currentThrow else firstFrameOfLastThree.throws
+          ),
+          secondFrameOfLastThree.updateFrame(currentThrow),
+        )
+      }
+      case 1 => List(
+        newFrameState,
+      )
+    };
+
+    return frames.dropRight(numberOfFramesThatCouldUpdate) ::: updatedLastFrames;
   }
 }
