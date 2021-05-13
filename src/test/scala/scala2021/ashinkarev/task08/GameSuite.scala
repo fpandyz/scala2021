@@ -9,5 +9,9 @@ import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 class GameSuite extends AnyFunSuite with TableDrivenPropertyChecks with ScalaCheckDrivenPropertyChecks with Matchers {
   test("empty string => 0") {
     new Game("").calculateScore() should be (0)
+  }  
+  
+  test("first strike throw => 10") {
+    new Game("X").calculateScore() should be (10)
   }
 }
