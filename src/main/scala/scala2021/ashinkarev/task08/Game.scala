@@ -122,7 +122,7 @@ class Game(input: String) {
         List(
           Frame(
             number = firstFrameOfLastThree.number, 
-            throws = if (firstFrameOfLastThree.isStrike) firstFrameOfLastThree.throws :+ currentThrow else firstFrameOfLastThree.throws
+            throws = if (firstFrameOfLastThree.isStrike && firstFrameOfLastThree.throws.length < 3) firstFrameOfLastThree.throws :+ currentThrow else firstFrameOfLastThree.throws
           ),
           Frame(
             number = secondFrameOfLastThree.number, 
