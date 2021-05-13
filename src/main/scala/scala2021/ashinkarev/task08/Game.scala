@@ -11,7 +11,6 @@ object Symbols {
 
 case class Frame(
   number: Int,
-  throwNumber: Int,
   throws: List[Int] = List(),
 ) {
   def score = throws.sum;
@@ -25,10 +24,9 @@ case class Frame(
     case _ if (throws.length == 3) => true 
   }
 
-  def updateFrame(currentThrow: Int, newThrowNumber: Int = throwNumber) = {
+  def updateFrame(currentThrow: Int) = {
     Frame(
       number = number, 
-      throwNumber = throwNumber,
       throws = throws :+ currentThrow
     )
   }
@@ -75,7 +73,6 @@ class Game(input: String) {
         case Symbols.FRAME => {
           val nextFrame = Frame(
             number = currentFrame.number + 1, 
-            throwNumber = 1
           )
 
           calculateScore(
@@ -87,7 +84,7 @@ class Game(input: String) {
         case _ => {
           val currentThrow = symbol.asDigit;
 
-          val newFrameState = currentFrame.updateFrame(symbol.asDigit, currentFrame.throwNumber + 1);
+          val newFrameState = currentFrame.updateFrame(symbol.asDigit);
 
           val numberOfFramesThatCouldUpdate = math.min(frames.length, 3);
 
@@ -102,15 +99,13 @@ class Game(input: String) {
               List(
                 Frame(
                   number = firstFrameOfLastThree.number, 
-                  throwNumber = firstFrameOfLastThree.throwNumber,
                   throws = if (firstFrameOfLastThree.isStrike) firstFrameOfLastThree.throws :+ currentThrow else firstFrameOfLastThree.throws
                 ),
                 Frame(
                   number = secondFrameOfLastThree.number, 
-                  throwNumber = secondFrameOfLastThree.throwNumber,
                   throws = if (secondFrameOfLastThree.isStrike || secondFrameOfLastThree.isSpare) secondFrameOfLastThree.throws :+ currentThrow else secondFrameOfLastThree.throws
                 ),
-                thirdFrameOfLastThree.updateFrame(currentThrow, thirdFrameOfLastThree.throwNumber + 1),
+                thirdFrameOfLastThree.updateFrame(currentThrow),
               )
             }
             case 2 => {
@@ -120,14 +115,13 @@ class Game(input: String) {
               List(
                 Frame(
                   number = firstFrameOfLastThree.number, 
-                  throwNumber = firstFrameOfLastThree.throwNumber,
                   throws = if (firstFrameOfLastThree.isStrike || firstFrameOfLastThree.isSpare) firstFrameOfLastThree.throws :+ currentThrow else firstFrameOfLastThree.throws
                 ),
-                secondFrameOfLastThree.updateFrame(currentThrow, secondFrameOfLastThree.throwNumber + 1),
+                secondFrameOfLastThree.updateFrame(currentThrow),
               )
             }
             case 1 => List(
-              currentFrame.updateFrame(currentThrow, currentFrame.throwNumber + 1)
+              currentFrame.updateFrame(currentThrow)
             )
           };
           
@@ -140,7 +134,7 @@ class Game(input: String) {
       }
     }
 
-    val firstFrame =  Frame(1, 1);
+    val firstFrame =  Frame(1);
 
     calculateScore(
       inputSymbolIndex = 0, 
