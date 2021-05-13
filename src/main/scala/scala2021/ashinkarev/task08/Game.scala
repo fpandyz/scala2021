@@ -92,17 +92,16 @@ class Game(input: String) {
             number = firstFrameOfLastThree.number, 
             throws = if (firstFrameOfLastThree.isStrike && firstFrameOfLastThree.throws.length < 3) firstFrameOfLastThree.throws :+ currentThrow else firstFrameOfLastThree.throws
           ),
-          Frame(
-            number = secondFrameOfLastThree.number,
-            throws = secondFrameOfLastThree.throws.length match {
-              case 3 => secondFrameOfLastThree.throws
-              case 2 if (secondFrameOfLastThree.isStrike) => secondFrameOfLastThree.throws :+ currentThrow
-              case 2 if (secondFrameOfLastThree.isSpare) => secondFrameOfLastThree.throws :+ currentThrow
-              case 1 if (secondFrameOfLastThree.isStrike) => secondFrameOfLastThree.throws :+ currentThrow
-              case 1 if (secondFrameOfLastThree.isSpare) => secondFrameOfLastThree.throws :+ currentThrow
-              case _ => secondFrameOfLastThree.throws
-            }
-          ),
+          secondFrameOfLastThree.throws.length match {
+            case 2 if (secondFrameOfLastThree.isStrike) => secondFrameOfLastThree.updateFrame(currentThrow)
+            case 2 if (secondFrameOfLastThree.isSpare) => secondFrameOfLastThree.updateFrame(currentThrow)
+            case 1 if (secondFrameOfLastThree.isStrike) => secondFrameOfLastThree.updateFrame(currentThrow)
+            case 1 if (secondFrameOfLastThree.isSpare) => secondFrameOfLastThree.updateFrame(currentThrow)
+            case _ => Frame(
+              secondFrameOfLastThree.number,
+              throws = secondFrameOfLastThree.throws
+            )
+          },
           thirdFrameOfLastThree.updateFrame(currentThrow),
         )
       }
