@@ -53,12 +53,14 @@ class Game(input: String) {
 
       symbol match {
         case Symbols.STRIKE => {
-          val newFrameState = currentFrame.updateFrame(10);
+          val currentThrow = 10;
+
+          val newFrameState = currentFrame.updateFrame(currentThrow);
 
           calculateScore(
             inputSymbolIndex = inputSymbolIndex + 1, 
             currentFrame = newFrameState,
-            frames = frames.dropRight(1) :+ newFrameState,
+            frames = updateFrames(frames, newFrameState),
           )
         }
         case Symbols.SPARE => {
@@ -125,7 +127,7 @@ class Game(input: String) {
             throws = if (firstFrameOfLastThree.isStrike && firstFrameOfLastThree.throws.length < 3) firstFrameOfLastThree.throws :+ currentThrow else firstFrameOfLastThree.throws
           ),
           Frame(
-            number = firstFrameOfLastThree.number,
+            number = secondFrameOfLastThree.number,
             throws = secondFrameOfLastThree.throws.length match {
               case 3 => secondFrameOfLastThree.throws
               case 2 if (secondFrameOfLastThree.isStrike) => secondFrameOfLastThree.throws :+ currentThrow
