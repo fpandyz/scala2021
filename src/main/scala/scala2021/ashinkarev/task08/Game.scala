@@ -28,65 +28,41 @@ class Game(input: String) {
       val prevSymbol = if (inputSymbolIndex == 0) '@' else input(inputSymbolIndex - 1);
       val symbol = input(inputSymbolIndex);
 
-      symbol match {
+      val tuple = symbol match {
         case Symbols.STRIKE => {
-          val currentThrow = 10;
+          val newFrameState = currentFrame.updateFrame(10);
 
-          val newFrameState = currentFrame.updateFrame(currentThrow);
-
-          calculateScore(
-            inputSymbolIndex = inputSymbolIndex + 1, 
-            currentFrame = newFrameState,
-            frames = updateFrames(frames, newFrameState),
-          )
+          (newFrameState, updateFrames(frames, newFrameState));
         }
         case Symbols.SPARE => {
-          val currentThrow = 10 - currentFrame.throws.last;
+          val newFrameState = currentFrame.updateFrame(10 - currentFrame.throws.last);
 
-          val newFrameState = currentFrame.updateFrame(currentThrow);
-
-          calculateScore(
-            inputSymbolIndex = inputSymbolIndex + 1, 
-            currentFrame = newFrameState,
-            frames = updateFrames(frames, newFrameState),
-          )
+          (newFrameState, updateFrames(frames, newFrameState));
         }
         case Symbols.FRAME => {
-          val nextFrame = Frame(
-            number = currentFrame.number + 1, 
-          )
+          val nextFrame = Frame(currentFrame.number + 1);
 
           val tenFramesPast = frames.length == 10;
-
-          calculateScore(
-            inputSymbolIndex = inputSymbolIndex + 1, 
-            currentFrame = nextFrame,
-            frames = if (tenFramesPast) frames else frames :+ nextFrame,
-          )
+          
+          (nextFrame, if (tenFramesPast) frames else frames :+ nextFrame);
         }
         case Symbols.MISS => {
-          val currentThrow = 0;
+          val newFrameState = currentFrame.updateFrame(0);
 
-          val newFrameState = currentFrame.updateFrame(currentThrow);
-
-          calculateScore(
-            inputSymbolIndex = inputSymbolIndex + 1, 
-            currentFrame = newFrameState,
-            frames = updateFrames(frames, newFrameState),
-          )
+          (newFrameState, updateFrames(frames, newFrameState));
         }
         case _ => {
-          val currentThrow = symbol.asDigit;
+          val newFrameState = currentFrame.updateFrame(symbol.asDigit);
 
-          val newFrameState = currentFrame.updateFrame(currentThrow);
-
-          calculateScore(
-            inputSymbolIndex = inputSymbolIndex + 1, 
-            currentFrame = newFrameState,
-            frames = updateFrames(frames, newFrameState),
-          )
+          (newFrameState, updateFrames(frames, newFrameState));
         }
       }
+      
+      calculateScore(
+        inputSymbolIndex = inputSymbolIndex + 1, 
+        currentFrame = tuple._1,
+        frames = tuple._2,
+      )
     }
 
     val firstFrame =  Frame(1);
