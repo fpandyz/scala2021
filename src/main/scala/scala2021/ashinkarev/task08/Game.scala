@@ -125,8 +125,15 @@ class Game(input: String) {
             throws = if (firstFrameOfLastThree.isStrike && firstFrameOfLastThree.throws.length < 3) firstFrameOfLastThree.throws :+ currentThrow else firstFrameOfLastThree.throws
           ),
           Frame(
-            number = secondFrameOfLastThree.number, 
-            throws = if (secondFrameOfLastThree.isStrike || secondFrameOfLastThree.isSpare) secondFrameOfLastThree.throws :+ currentThrow else secondFrameOfLastThree.throws
+            number = firstFrameOfLastThree.number,
+            throws = secondFrameOfLastThree.throws.length match {
+              case 3 => secondFrameOfLastThree.throws
+              case 2 if (secondFrameOfLastThree.isStrike) => secondFrameOfLastThree.throws :+ currentThrow
+              case 2 if (secondFrameOfLastThree.isSpare) => secondFrameOfLastThree.throws :+ currentThrow
+              case 1 if (secondFrameOfLastThree.isStrike) => secondFrameOfLastThree.throws :+ currentThrow
+              case 1 if (secondFrameOfLastThree.isSpare) => secondFrameOfLastThree.throws :+ currentThrow
+              case _ => secondFrameOfLastThree.throws
+            }
           ),
           thirdFrameOfLastThree.updateFrame(currentThrow),
         )
