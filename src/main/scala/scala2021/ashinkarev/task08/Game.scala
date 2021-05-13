@@ -26,8 +26,8 @@ class Game(input: String) {
 
       symbol match {
         case Symbols.STRIKE => calculateScore(index + 1, score + 10)
-        case Symbols.SPARE => calculateScore(index + 1,  score + (10 - prevSymbol.toInt))
-        case _ => calculateScore(index + 1,  score + symbol.toInt)
+        case Symbols.SPARE => calculateScore(index + 1,  score + (10 - prevSymbol.asDigit))
+        case _ => calculateScore(index + 1,  score + symbol.asDigit)
       }
     }
 
