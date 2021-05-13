@@ -70,4 +70,8 @@ class GameSuite extends AnyFunSuite with TableDrivenPropertyChecks with ScalaChe
   test("9-|9-|9-|9-|9-|9-|9-|9-|9-|9-|| => 90") {
     new Game("9-|9-|9-|9-|9-|9-|9-|9-|9-|9-||").score() should be (90)
   }
+
+  test("X|7/|9-|X|-8|8/|-6|X|X|X||81 => 167") {
+    new Game("X|7/|9-|X|-8|8/|-6|X|X|X||81").score() should be (167)
+  }
 }
