@@ -14,4 +14,8 @@ class GameSuite extends AnyFunSuite with TableDrivenPropertyChecks with ScalaChe
   test("first strike throw => 10") {
     new Game("X").calculateScore() should be (10)
   }
+
+  test("first frame spare throw => 10") {
+    new Game("7/").calculateScore() should be (10)
+  }
 }
