@@ -87,6 +87,17 @@ class Game(input: String) {
             frames = if (tenFramesPast) frames else frames :+ nextFrame,
           )
         }
+        case Symbols.MISS => {
+          val currentThrow = 0;
+
+          val newFrameState = currentFrame.updateFrame(currentThrow);
+
+          calculateScore(
+            inputSymbolIndex = inputSymbolIndex + 1, 
+            currentFrame = newFrameState,
+            frames = updateFrames(frames, newFrameState),
+          )
+        }
         case _ => {
           val currentThrow = symbol.asDigit;
 
@@ -151,6 +162,7 @@ class Game(input: String) {
             number = firstFrameOfLastThree.number, 
             throws = firstFrameOfLastThree.throws.length match {
               case 3 => firstFrameOfLastThree.throws
+              case 2 if (!firstFrameOfLastThree.isStrike && !firstFrameOfLastThree.isSpare) => firstFrameOfLastThree.throws
               case _ => firstFrameOfLastThree.throws :+ currentThrow
             }
           ),
