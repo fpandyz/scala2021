@@ -16,3 +16,4 @@ case class Converter(conversion: Conversion) {
 object Converter {
   implicit val converter = new Converter(Map())
 }
+
