@@ -15,3 +15,4 @@ case class Money(amount: BigDecimal, currency: Currency)(implicit converter: Con
     (this.amount + convertedMoney.amount)(this.currency)
   }
 }
+

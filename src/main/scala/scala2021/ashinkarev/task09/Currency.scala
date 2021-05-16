@@ -14,3 +14,4 @@ object EUR extends Currency {
 object GBP extends Currency {
   override val toString = "GBP"
 }
+

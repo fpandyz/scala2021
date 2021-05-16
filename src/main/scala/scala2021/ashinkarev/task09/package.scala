@@ -14,3 +14,4 @@ package object task09 {
     def apply(currency: Currency)(implicit converter: Converter): Money = BigDecimal(value).apply(currency)
   }
 }
+

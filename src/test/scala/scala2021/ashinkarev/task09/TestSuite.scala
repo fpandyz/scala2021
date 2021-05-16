@@ -24,3 +24,4 @@ class TestSuite extends AnyFunSuite with TableDrivenPropertyChecks with ScalaChe
     (sum to GBP).amount should be (51.3765);
   }
 }
+
